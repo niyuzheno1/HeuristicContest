@@ -608,13 +608,12 @@ void Solve() {
     }
     UpdateBest();
 
-    if (1) {
-        int itc = 16;
-        F0(u, itc) {
-            SolveGreedy(u < itc - 1);
-        }
-        LoadBest();
+    while (Elapsed() < 4.0) {
+        SolveGreedy(true);
     }
+    SolveGreedy(false);
+    LoadBest();
+  
 
     F0(i, n) {
         cout << X1[i] << " " << Y1[i] << " " << X2[i]+1 << " " << Y2[i]+1 << endl;
