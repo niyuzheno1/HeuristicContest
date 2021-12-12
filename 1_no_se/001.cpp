@@ -59,16 +59,16 @@ int main(){
 		S[i].y2=Y[i]+1;
 		ord[i]=i;
 	}
-	for(int _=1000000;_>=0;_--){
+	for(int _=1100000;_>=0;_--){
 		int p,q;
 		p=xor128()%10000;
 		q=xor128()%10000;
-		random_shuffle(ord,ord+N);
 		for(int i=0;i<N;i++){
 			int t=ord[i];
+			swap(ord[i],ord[xor128()%N]);
 			rect nr=newrect(S[t],X[t],Y[t],p,q);
 			if(nr.area()>R[t]*2)continue;
-			if(-(abs(1-(double)min(R[t],nr.area())/max(R[t],nr.area()))-abs(1-(double)min(R[t],S[t].area())/max(R[t],S[t].area())))>=-(double)_/10000000){
+			if(-(abs(1-(double)min(R[t],nr.area())/max(R[t],nr.area()))-abs(1-(double)min(R[t],S[t].area())/max(R[t],S[t].area())))>=-(double)_/7500000){
 				bool f=true;
 				for(int j=0;j<N;j++){
 					if(j==t)continue;
@@ -84,7 +84,7 @@ int main(){
 			}
 		}
 	}
-	for(int _=0;_<300;_++){
+	for(int _=0;_<200;_++){
 		for(int i=0;i<N;i++){
 			if(R[i]>S[i].area()){
 				rect rx;
