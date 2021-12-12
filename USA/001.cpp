@@ -80,7 +80,6 @@ int n;
 int X[N], Y[N], r[N], lck[N];
 double bscore;
 Rect bans[N];
-vector<int> adj[N];
 double delta, act_score, score;
 int bad, dir;
 int X1[N], Y1[N], X2[N], Y2[N], s[N];
@@ -922,11 +921,6 @@ void SolveSA() {
 
 vector<int> active;
 void SolveLocal() {
-    LoadBest();
-    for (int i : active) {
-        X1[i] = X2[i] = X[i];
-        Y1[i] = Y2[i] = Y[i];
-    }
     F0(i, M/CR+1) F0(j, M/CR+1) tn[i][j] = 0;
     F0(i, n) {
         coverx[i].n = 0;
@@ -954,8 +948,8 @@ void SolveLocal() {
 
     vector<int> faker(n, 0);
     F0(i, n) faker[i] = r[i];
-    int prep = 25;
-    int itc = 50;
+    int prep = 50;
+    int itc = 75;
     F1(it, itc) {
         double x = 1.0 * it / prep;
         double p = pow(x, 0.5);
@@ -965,12 +959,13 @@ void SolveLocal() {
             if (it >= prep) r[i] = faker[i];
             else r[i] = max(1, (int)(faker[i] * p));
             s[i] = (X2[i] - X1[i] + 1) * (Y2[i] - Y1[i] + 1);
-            score += upper(s[i], r[i]);
+            if (it >= prep) score += upper(s[i], r[i]);
         }
         sort(id, id + nn, [&](int i1, int i2) { return 1LL*s[i1]*r[i2] < 1LL*s[i2]*r[i1]; });
         F0(u, nn) {
             int i = id[u];
-            score -= upper(s[i], r[i]);
+            if (s[i] > r[i]) continue;
+            if (it >= prep) score -= upper(s[i], r[i]);
             qox1 = X1[i]; qox2 = X2[i]; qoy1 = Y1[i]; qoy2 = Y2[i];
             RemT(i);
             GenBoundaryFast(i);
@@ -1027,37 +1022,28 @@ void SolveLocal() {
 }
 
 
-double raws[N];
+vector<pii> adj[N];
 void LocalS() {
-    //double TL = Elapsed() + 2.0;
+    F0(i, n) {
+        F0(j, n) if (j != i) adj[i].push_back(make_pair(abs(X[i]-X[j]) + abs(Y[i]-Y[j]), j));
+        sort(adj[i].begin(), adj[i].end());
+    }
     while (Elapsed() < TL1) {
-        c_o[1]++;
+        c_o[2]++;
 
         active.clear();
-        int MINT = 12;
-        int MAXT = 16;
+        int MINT = 11;
+        int MAXT = 15;
 
         int T = my.nextInt(MINT, MAXT);
         int st = my.nextInt(n);
 
         set<int> chosen;
         chosen.insert(st);
-
-        int lx = st, ly = st;
-        while (SZ(chosen) < T && (lx < n || ly < n)) {
-            int d = my.nextInt(2);
-            if (d) {
-                lx = nx[lx];
-                if (lx != n && !chosen.count(lx)) {
-                    chosen.insert(lx);
-                }
-            } else {
-                ly = ny[ly];
-                if (ly != n && !chosen.count(ly)) {
-                    chosen.insert(ly);
-                }
-            }
+        F0(j, T) {
+            chosen.insert(adj[st][j].second);
         }
+
         LoadBest();
         if (1) {
             SUBX1 = M; SUBX2 = 0;
@@ -1073,9 +1059,21 @@ void LocalS() {
             SUBX2 = min(SUBX2, M-1);
             SUBY2 = min(SUBY2, M-1);
         }
-        active.assign(chosen.begin(), chosen.end());
-        if (SZ(active) < MINT) continue;
+
+        active.clear();
+        for (int i : chosen) //if (my.nextInt(3))
+            active.push_back(i);
+        double pscore = bscore;
+        for (int i : active) {
+            X1[i] = X2[i] = X[i];
+            Y1[i] = Y2[i] = Y[i];
+        }
         SolveLocal();
+        //cerr << pscore << " " << NaiveScore() << endl;
+        if (bscore > pscore) {
+            //PR(bscore - pscore);
+            //return;
+        }
     }
 }
 
@@ -1083,21 +1081,6 @@ void Solve(bool print_ans = true) {
     Init();
     PR(n);
     F0(i, LOGN) logs[i] = -log((i+0.5)/LOGN);
-
-    if (0) {
-        int maxr = 0;
-        F0(i, n) {
-            maxr = max(maxr, r[i]);
-        }
-        PR(maxr);
-    }
-
-    F0(i, n) {
-        vector<pii> v;
-        F0(j, n) if (i != j) v.push_back(pii((abs(X[i]-X[j])+abs(Y[i]-Y[j])), j));
-        sort(v.begin(), v.end());
-        F0(j, SZ(v)) adj[i].push_back(v[j].second);
-    }
 
     vector<pii> sorted;
     X[n] = inf; Y[n] = inf;
@@ -1131,16 +1114,15 @@ void Solve(bool print_ans = true) {
 
     if (1) {
         int lc = 0;
-        //F0(it, 8) {
         while (Elapsed() < TL0) {
             lc++;
             if (lc % 10 == 0) PR(lc);
             SolveGreedy(true);
         }
+        PR(lc);
         SolveGreedy(false);
-        if (1) {
-            LocalS();
-        }
+        LocalS();
+        PR(c_o[1]);
         LoadBest();
     }
 
@@ -1166,8 +1148,6 @@ void Solve(bool print_ans = true) {
         }
         act_score += rw;
     }    //if (!print_ans)
-    act_score /= n;
-    Report();
 }
 
 
