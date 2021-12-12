@@ -334,14 +334,14 @@ void GenBoundaryFast(int i) {
         int j = undecided[uuu];
         if (X1[j] > X2[i] && (dx = bx2-X1[j]+1) > 0) {
             if (Y1[j] > Y2[i] && (dy = by2-Y1[j]+1) > 0) {
-                if (my.nextInt(dx+dy) < dx) {
+                if (my.nextInt(2)) {
                     by2 -= dy;
                 } else {
                     bx2 -= dx;
                 }
             }
             if (Y1[j] < Y2[i] && (dy = Y2[j]+1-by1) > 0) {
-                if (my.nextInt(dx+dy) < dx) {
+                if (my.nextInt(2)) {
                     by1 += dy;
                 } else {
                     bx2 -= dx;
@@ -350,14 +350,14 @@ void GenBoundaryFast(int i) {
         }
         if (X1[j] < X2[i] && (dx = X2[j]+1-bx1)>0) {
             if (Y1[j] > Y2[i] && (dy = by2-Y1[j]+1) > 0) {
-                if (my.nextInt(dx+dy) < dx) {
+                if (my.nextInt(2)) {
                     by2 -= dy;
                 } else {
                     bx1 += dx;
                 }
             }
             if (Y1[j] < Y2[i] && (dy = Y2[j]+1-by1) > 0) {
-                if (my.nextInt(dx+dy) < dx) {
+                if (my.nextInt(2)) {
                     by1 += dy;
                 } else {
                     bx1 += dx;
@@ -482,12 +482,6 @@ const int d1 = 9;
 const int d0 = d1+1;
 const int d2 = 2*d0+1;
 bool ExpandStep(int i) {
-    while (X1[i] > bx1+d1 && d1+X2[i] < bx2 && Y1[i] > by1+d1 && d1+Y2[i] < by2 && (Y2[i] - Y1[i] + d2) * (X2[i] - X1[i] + d2) <= r[i]) {
-        X1[i]-=d0;
-        X2[i]+=d0;
-        Y1[i]-=d0;
-        Y2[i]+=d0;
-    }
 
     int xlimit = min(r[i] / (Y2[i] - Y1[i] + 1) - (X2[i] - X1[i] + 1), maxs);
     int ylimit = min(r[i] / (X2[i] - X1[i] + 1) - (Y2[i] - Y1[i] + 1), maxs);
@@ -1032,8 +1026,8 @@ void LocalS() {
         c_o[2]++;
 
         active.clear();
-        int MINT = 11;
-        int MAXT = 15;
+        int MINT = 9;
+        int MAXT = 13;
 
         int T = my.nextInt(MINT, MAXT);
         int st = my.nextInt(n);
@@ -1045,28 +1039,22 @@ void LocalS() {
         }
 
         LoadBest();
-        if (1) {
-            SUBX1 = M; SUBX2 = 0;
-            SUBY1 = M; SUBY2 = 0;
-            for (int i : chosen) {
-                SUBX1 = min(SUBX1, X1[i] - 1000);
-                SUBY1 = min(SUBY1, Y1[i] - 1000);
-                SUBX2 = max(SUBX2, X2[i] + 1000);
-                SUBY2 = max(SUBY2, Y2[i] + 1000);
-            }
-            SUBX1 = max(SUBX1, 0);
-            SUBY1 = max(SUBY1, 0);
-            SUBX2 = min(SUBX2, M-1);
-            SUBY2 = min(SUBY2, M-1);
-        }
-
         active.clear();
         for (int i : chosen) //if (my.nextInt(3))
             active.push_back(i);
         double pscore = bscore;
+        if (my.nextInt(2)==7) {
         for (int i : active) {
             X1[i] = X2[i] = X[i];
             Y1[i] = Y2[i] = Y[i];
+        }
+        } else {
+            for (int i : active) {
+                X1[i] = my.nextInt(X1[i], X[i]);
+                X2[i] = my.nextInt(X[i], X2[i]);
+                Y1[i] = my.nextInt(Y1[i], Y[i]);
+                Y2[i] = my.nextInt(Y[i], Y2[i]);
+            }
         }
         SolveLocal();
         //cerr << pscore << " " << NaiveScore() << endl;
