@@ -59,7 +59,7 @@ int main(){
 		S[i].y2=Y[i]+1;
 		ord[i]=i;
 	}
-	for(int _=100000;_>=0;_--){
+	for(int _=800000;_>=0;_--){
 		int p,q;
 		p=xor128()%10000;
 		q=xor128()%10000;
@@ -68,7 +68,7 @@ int main(){
 			int t=ord[i];
 			rect nr=newrect(S[t],X[t],Y[t],p,q);
 			if(nr.area()>R[t]*2)continue;
-			if(-(abs(1-(double)min(R[t],nr.area())/max(R[t],nr.area()))-abs(1-(double)min(R[t],S[t].area())/max(R[t],S[t].area())))>=-(double)_/1000000){
+			if(-(abs(1-(double)min(R[t],nr.area())/max(R[t],nr.area()))-abs(1-(double)min(R[t],S[t].area())/max(R[t],S[t].area())))>=-(double)_/10000000){
 				bool f=true;
 				for(int j=0;j<N;j++){
 					if(j==t)continue;
@@ -82,6 +82,42 @@ int main(){
 					break;
 				}
 			}
+		}
+	}
+	for(int i=0;i<N;i++){
+		rect rx,ry;
+		rx=ry=S[i];
+		rx.x1=0;
+		rx.x2=10000;
+		ry.y1=0;
+		ry.y2=10000;
+		int Xmin,Ymin,Xmax,Ymax;
+		Xmin=Ymin=0;
+		Xmax=Ymax=10000;
+		for(int j=0;j<N;j++){
+			if(i==j)continue;
+			if(across(rx,S[j])){
+				if(S[j].x2<S[i].x1){
+					Xmin=max(Xmin,S[j].x2);
+				}
+				else{
+					Xmax=min(Xmax,S[j].x1);
+				}
+			}
+			if(across(ry,S[j])){
+				if(S[j].y2<S[i].x1){
+					Ymin=max(Ymin,S[j].y2);
+				}
+				else{
+					Ymax=min(Ymin,S[j].y1);
+				}
+			}
+		}
+		if(R[i]>S[i].area()){
+			S[i].x1=max(Xmin,S[i].x1-(R[i]-S[i].area())/(S[i].y2-S[i].y1));
+			S[i].y1=max(Ymin,S[i].y1-(R[i]-S[i].area())/(S[i].x2-S[i].x1));
+			S[i].x2=min(Xmax,S[i].x2+(R[i]-S[i].area())/(S[i].y2-S[i].y1));
+			S[i].y2=min(Ymax,S[i].y2+(R[i]-S[i].area())/(S[i].x2-S[i].x1));
 		}
 	}
 	for(int i=0;i<N;i++){
