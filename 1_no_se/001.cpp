@@ -84,40 +84,58 @@ int main(){
 			}
 		}
 	}
-	for(int i=0;i<N;i++){
-		rect rx,ry;
-		rx=ry=S[i];
-		rx.x1=0;
-		rx.x2=10000;
-		ry.y1=0;
-		ry.y2=10000;
-		int Xmin,Ymin,Xmax,Ymax;
-		Xmin=Ymin=0;
-		Xmax=Ymax=10000;
-		for(int j=0;j<N;j++){
-			if(i==j)continue;
-			if(across(rx,S[j])){
-				if(S[j].x2<S[i].x1){
-					Xmin=max(Xmin,S[j].x2);
+	for(int _=0;_<300;_++){
+		for(int i=0;i<N;i++){
+			if(R[i]>S[i].area()){
+				rect rx;
+				rx=S[i];
+				rx.x1=0;
+				rx.x2=10000;
+				int Xmin,Xmax;
+				Xmin=0;
+				Xmax=10000;
+				for(int j=0;j<N;j++){
+					if(i==j)continue;
+					if(across(rx,S[j])){
+						if(S[j].x2<=S[i].x1){
+							Xmin=max(Xmin,S[j].x2);
+						}
+						else{
+							Xmax=min(Xmax,S[j].x1);
+						}
+					}
 				}
-				else{
-					Xmax=min(Xmax,S[j].x1);
-				}
+				S[i].x1=max(Xmin,S[i].x1-(R[i]-S[i].area())/(S[i].y2-S[i].y1));
+				S[i].x2=min(Xmax,S[i].x2+(R[i]-S[i].area())/(S[i].y2-S[i].y1));
 			}
-			if(across(ry,S[j])){
-				if(S[j].y2<S[i].x1){
-					Ymin=max(Ymin,S[j].y2);
+			if(R[i]>S[i].area()){
+				rect ry;
+				ry=S[i];
+				ry.y1=0;
+				ry.y2=10000;
+				int Ymin,Ymax;
+				Ymin=0;
+				Ymax=10000;
+				for(int j=0;j<N;j++){
+					if(i==j)continue;
+					if(across(ry,S[j])){
+						if(S[j].y2<=S[i].y1){
+							Ymin=max(Ymin,S[j].y2);
+						}
+						else{
+							Ymax=min(Ymax,S[j].y1);
+						}
+					}
 				}
-				else{
-					Ymax=min(Ymin,S[j].y1);
-				}
+				S[i].y1=max(Ymin,S[i].y1-(R[i]-S[i].area())/(S[i].x2-S[i].x1));
+				S[i].y2=min(Ymax,S[i].y2+(R[i]-S[i].area())/(S[i].x2-S[i].x1));
 			}
-		}
-		if(R[i]>S[i].area()){
-			S[i].x1=max(Xmin,S[i].x1-(R[i]-S[i].area())/(S[i].y2-S[i].y1));
-			S[i].y1=max(Ymin,S[i].y1-(R[i]-S[i].area())/(S[i].x2-S[i].x1));
-			S[i].x2=min(Xmax,S[i].x2+(R[i]-S[i].area())/(S[i].y2-S[i].y1));
-			S[i].y2=min(Ymax,S[i].y2+(R[i]-S[i].area())/(S[i].x2-S[i].x1));
+			if(S[i].area()>R[i]){
+				S[i].x1=min(X[i],S[i].x1+(S[i].area()-R[i])/(S[i].y2-S[i].y1));
+				S[i].x2=max(X[i]+1,S[i].x2-(S[i].area()-R[i])/(S[i].y2-S[i].y1));
+				S[i].y1=min(Y[i],S[i].y1+(S[i].area()-R[i])/(S[i].x2-S[i].x1));
+				S[i].y2=max(Y[i]+1,S[i].y2-(S[i].area()-R[i])/(S[i].x2-S[i].x1));		
+			}
 		}
 	}
 	for(int i=0;i<N;i++){
